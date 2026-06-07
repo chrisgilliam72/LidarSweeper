@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="../LidarScanner/LidarSweeper/LidarSweeper.csproj" />
-  <Project Path="../LidarScanner/UltraborgLib/UltraborgLib.csproj" />
+  <Project Path="LidarSweeper/LidarSweeper.csproj" />
+  <Project Path="UltraborgLib/UltraborgLib.csproj" />
 </Solution>
