@@ -28,30 +28,32 @@ ILogger logger = loggerFactory.CreateLogger<Program>();
 var ultraborgAPI= host.Services.GetRequiredService<IUltraborgAPI>();
 var lidar = host.Services.GetRequiredService<ILidarService>();
 
-    ultraborgAPI.Setup();
-    var ultraborg = ultraborgAPI?.Ultraborg;
-    var ultraborgServo = new UltraborgServo(4, 0,loggerFactory);
-    ultraborgServo.Init(ultraborg!);
-    int currentPosition = ultraborgServo.GetCurrentPosition();
-    logger.LogInformation($"Current Position: {currentPosition}");
-    int servoMax= ultraborgServo.ServoMax;
-    int servoMin= ultraborgServo.ServoMin;
-    ultraborgServo.SetServoPosition(-0.95);
+ultraborgAPI.Setup();
+var ultraborg = ultraborgAPI?.Ultraborg;
+var ultraborgServo = new UltraborgServo(4, 0,loggerFactory);
+ultraborgServo.Init(ultraborg!);
+int currentPosition = ultraborgServo.GetCurrentPosition();
+logger.LogInformation($"Current Position: {currentPosition}");
+int servoMax= ultraborgServo.ServoMax;
+int servoMin= ultraborgServo.ServoMin;
+ultraborgServo.SetServoPosition(-0.95);
+currentPosition = ultraborgServo.GetCurrentPosition();
+logger.LogInformation($"Start Position: {currentPosition}");
+await lidar.StartAsync();
+
+double pos=-1;
+while (pos <= 1)
+{
+    pos+=0.1;
+    ultraborgServo.SetServoPosition(pos);
+    Thread.Sleep(100);
     currentPosition = ultraborgServo.GetCurrentPosition();
-    logger.LogInformation($"Start Position: {currentPosition}");
-    double pos=-1;
-    while (pos <= 1)
-    {
-        pos+=0.1;
-        ultraborgServo.SetServoPosition(pos);
-        Thread.Sleep(100);
-        currentPosition = ultraborgServo.GetCurrentPosition();
-        logger.LogInformation($"Current Position: {currentPosition}");
-        logger.LogInformation(
-        "Distance={Distance} cm  Strength={Strength}  Temp={Temperature:F1}°C",
-        lidar.Distance,
-        lidar.Strength,
-        lidar.Temperature);
+    logger.LogInformation($"Current Position: {currentPosition}");
+    logger.LogInformation(
+    "Distance={Distance} cm  Strength={Strength}  Temp={Temperature:F1}°C",
+    lidar.Distance,
+    lidar.Strength,
+    lidar.Temperature);
 }
 
    
