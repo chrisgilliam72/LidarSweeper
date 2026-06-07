@@ -1,4 +1,5 @@
 ﻿using Iot.Device.Board;
+using LidarSweeper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
         services.AddSingleton<IUltraborgAPI, UltraborgAPI>();
+        services.AddSingleton<ILidarService, LidarService>();
 
     })
     .Build();
