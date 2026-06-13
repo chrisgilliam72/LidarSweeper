@@ -1,3 +1,5 @@
+using LidarLib;
+using LidarSweeper;
 using UI.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddLidarSweepServices();
 var app = builder.Build();
+
+
+var lidar = app.Services.GetRequiredService<ILidarService>();
+
+await lidar.StartAsync();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

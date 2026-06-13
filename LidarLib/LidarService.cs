@@ -52,6 +52,7 @@ public class LidarService : ILidarService
 
     public Task StartAsync(CancellationToken cancellationToken = default)
     {
+        Init();
         if (_readerTask != null)
             return Task.CompletedTask;
 
