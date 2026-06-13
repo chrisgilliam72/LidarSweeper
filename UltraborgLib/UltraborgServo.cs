@@ -24,6 +24,7 @@ namespace Ultraborg.Library.Servo
         private double _position { get; set; }
         private  readonly ILogger _logger;
 
+        public double Postion => _position;
 
         public UltraborgServo(int servoNo, double servoNeutral,ILogger logger)
         {
