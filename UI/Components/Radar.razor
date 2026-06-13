@@ -1,32 +1,57 @@
 ﻿@page "/radar"
+@rendermode InteractiveServer
 @implements IDisposable
 
-<div style="background-color:black;width:800px;height:800px;border:1px solid lime">
+<div style="background-color:black;width:800px;height:450px;border:2px solid lime">
 
-    <svg width="800" height="800">
+    <svg width="800" height="450">
 
-        <!-- Range Rings -->
-        <circle cx="400" cy="400" r="100" stroke="lime" stroke-width="1" fill="none" />
-        <circle cx="400" cy="400" r="200" stroke="lime" stroke-width="1" fill="none" />
-        <circle cx="400" cy="400" r="300" stroke="lime" stroke-width="1" fill="none" />
+        <!-- Outer Ring -->
+        <path d="M100 400 A300 300 0 0 1 700 400"
+              stroke="lime"
+              stroke-width="1"
+              fill="none" />
 
-        <!-- Horizontal -->
-        <line x1="100" y1="400" x2="700" y2="400"
-              stroke="lime" stroke-width="1" />
+        <!-- Middle Ring -->
+        <path d="M200 400 A200 200 0 0 1 600 400"
+              stroke="lime"
+              stroke-width="1"
+              fill="none" />
 
-        <!-- Vertical -->
-        <line x1="400" y1="100" x2="400" y2="700"
-              stroke="lime" stroke-width="1" />
+        <!-- Inner Ring -->
+        <path d="M300 400 A100 100 0 0 1 500 400"
+              stroke="lime"
+              stroke-width="1"
+              fill="none" />
 
-        <!-- Sweep line -->
-        <line x1="400"
+        <!-- Ground Line -->
+
+        <line x1="100"
               y1="400"
+              x2="700"
+              y2="400"
+              stroke="lime"
+              stroke-width="1" />
+
+        <!-- Centre Line -->
+
+        <line x1="400"
+              y1="100"
+              x2="400"
+              y2="400"
+              stroke="lime"
+              stroke-width="1" />
+
+        <!-- Sweep -->
+
+        <line x1="@CentreX"
+              y1="@CentreY"
               x2="@SweepX"
               y2="@SweepY"
               stroke="lime"
               stroke-width="2" />
 
-        <!-- Lidar Points -->
+        <!-- Radar points -->
         @foreach (var point in Points)
         {
             <circle cx="@point.X"
@@ -37,8 +62,8 @@
 
         <!-- Robot -->
 
-        <circle cx="400"
-                cy="400"
+        <circle cx="@CentreX"
+                cy="@CentreY"
                 r="8"
                 fill="red" />
 
@@ -46,42 +71,35 @@
 
 </div>
 
-<div class="mt-2 text-success">
-
-    Angle: @SweepAngle°
-
-</div>
+<h4 style="color:lime">
+    Sweep Angle : @SweepAngle
+</h4>
 
 @code
 {
-    private System.Threading.Timer? _timer;
+    private Timer? timer;
 
-    private double SweepAngle = -90;
-
-    private bool MovingRight = true;
-
+    private const double CentreX = 400;
+    private const double CentreY = 400;
     private const double Radius = 300;
 
-    public class RadarPoint
-    {
-        public double X { get; set; }
+    private double SweepAngle = 180;
 
-        public double Y { get; set; }
+    private bool MovingRight = false;
 
-        public DateTime TimeStamp { get; set; }
-    }
+    public record RadarPoint(double X, double Y, DateTime TimeStamp);
 
-    private List<RadarPoint> Points = new();
+    private readonly List<RadarPoint> Points = new();
 
     private double SweepX =>
-        400 + Radius * Math.Cos(SweepAngle * Math.PI / 180);
+        CentreX + Radius * Math.Cos(SweepAngle * Math.PI / 180);
 
     private double SweepY =>
-        400 - Radius * Math.Sin(SweepAngle * Math.PI / 180);
+        CentreY - Radius * Math.Sin(SweepAngle * Math.PI / 180);
 
     protected override void OnInitialized()
     {
-        _timer = new Timer(UpdateRadar, null, 0, 50);
+        timer = new Timer(UpdateRadar, null, 0, 50);
     }
 
     private void UpdateRadar(object? state)
@@ -90,47 +108,41 @@
         {
             SweepAngle += 2;
 
-            if (SweepAngle >= 90)
+            if (SweepAngle >= 180)
                 MovingRight = false;
         }
         else
         {
             SweepAngle -= 2;
 
-            if (SweepAngle <= -90)
+            if (SweepAngle <= 0)
                 MovingRight = true;
         }
 
-        //
-        // Fake lidar point for now
-        //
+        // Fake point
 
-        double distance = 150 + Random.Shared.NextDouble() * 120;
+        double distance = 100 + Random.Shared.NextDouble() * 180;
 
         double radians = SweepAngle * Math.PI / 180;
 
-        double x = 400 + distance * Math.Cos(radians);
+        double x = CentreX + distance * Math.Cos(radians);
 
-        double y = 400 - distance * Math.Sin(radians);
+        double y = CentreY - distance * Math.Sin(radians);
 
-        Points.Add(new RadarPoint
+        lock (Points)
         {
-            X = x,
-            Y = y,
-            TimeStamp = DateTime.Now
-        });
+            Points.Add(new RadarPoint(x, y, DateTime.Now));
 
-        // Fade old points
+            Points.RemoveAll(p =>
+                DateTime.Now - p.TimeStamp >
+                TimeSpan.FromSeconds(2));
+        }
 
-        Points.RemoveAll(p =>
-            DateTime.Now - p.TimeStamp >
-            TimeSpan.FromSeconds(2));
-
-        InvokeAsync(StateHasChanged);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        _timer?.Dispose();
+        timer?.Dispose();
     }
 }
