@@ -9,5 +9,6 @@ public interface ILidarService : IDisposable
 {
     LidarPoint? LastPoint { get; set; }
 
+    void Init();
     Task StartAsync(CancellationToken cancellationToken = default);
 }

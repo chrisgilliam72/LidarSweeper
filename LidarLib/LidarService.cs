@@ -19,8 +19,9 @@ public class LidarService : ILidarService
     private Task? _readerTask;
     private CancellationTokenSource? _cts;
 
+    private int _currentPosition = 0;
+    private UltraborgServo? _ultraborgServo;
     public LidarPoint? LastPoint { get; set; }
-
 
     public LidarService(ILogger<LidarService> logger, UltraborgAPI ultraborgAPI)
     {
@@ -36,15 +37,15 @@ public class LidarService : ILidarService
     {
         _ultraborgAPI.Setup();
         var ultraborg = _ultraborgAPI?.Ultraborg;
-        var ultraborgServo = new UltraborgServo(4, 0, _logger);
-        ultraborgServo.Init(ultraborg!);
-        int currentPosition = ultraborgServo.GetCurrentPosition();
-        _logger.LogInformation($"Current Position: {currentPosition}");
-        int servoMax = ultraborgServo.ServoMax;
-        int servoMin = ultraborgServo.ServoMin;
-        ultraborgServo.SetServoPosition(-0.95);
-        currentPosition = ultraborgServo.GetCurrentPosition();
-        _logger.LogInformation($"Start Position: {currentPosition}");
+        _ultraborgServo = new UltraborgServo(4, 0, _logger);
+        _ultraborgServo.Init(ultraborg!);
+        _currentPosition = _ultraborgServo.GetCurrentPosition();
+        _logger.LogInformation($"Current Position: {_currentPosition}");
+        int servoMax = _ultraborgServo.ServoMax;
+        int servoMin = _ultraborgServo.ServoMin;
+        _ultraborgServo.SetServoPosition(-0.95);
+        _currentPosition = _ultraborgServo.GetCurrentPosition();
+        _logger.LogInformation($"Start Position: {_currentPosition}");
     }
 
     public Task StartAsync(CancellationToken cancellationToken = default)
@@ -56,6 +57,8 @@ public class LidarService : ILidarService
 
         _logger.LogInformation("Opened lidar on {Port}", _port.PortName);
 
+
+
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         _readerTask = Task.Run(() => ReadLoop(_cts.Token));
@@ -65,11 +68,28 @@ public class LidarService : ILidarService
 
     private void ReadLoop(CancellationToken token)
     {
+
+        double servoPos = -1;
+        int angle= 0;
         while (!token.IsCancellationRequested)
         {
             try
             {
-                GetLidarPoint();
+                var lastPoint=  GetLidarPoint();
+                if (servoPos < 1)
+                {
+                    angle += 10;
+                    servoPos += 0.1;
+                }
+                else
+                {
+                    angle -= 10;
+                    servoPos -= 0.1;
+                }           
+
+                _ultraborgServo!.SetServoPosition(servoPos);
+                if (lastPoint is not null)
+                    lastPoint= lastPoint with { Angle = angle };
             }
             catch (TimeoutException)
             {
