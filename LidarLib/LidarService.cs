@@ -4,6 +4,7 @@ using System.Text;
 
 namespace LidarSweeper;
 
+using Iot.Device.GoPiGo3.Models;
 using LidarLib;
 using Microsoft.Extensions.Logging;
 using System.IO.Ports;
@@ -44,6 +45,7 @@ public class LidarService : ILidarService
         _logger.LogInformation($"Current Position: {_currentPosition}");
         int servoMax = _ultraborgServo.ServoMax;
         int servoMin = _ultraborgServo.ServoMin;
+        _ultraborgServo!.SetServoPosition(-1);
     }
 
     public Task StartAsync(CancellationToken cancellationToken = default)
@@ -70,7 +72,6 @@ public class LidarService : ILidarService
         double servoPos = -1;
         int angle= 0;
         bool rightLeft = true;
-        _ultraborgServo!.SetServoPosition(servoPos);
         while (!token.IsCancellationRequested)
         {
             try

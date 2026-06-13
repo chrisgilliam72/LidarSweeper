@@ -28,6 +28,8 @@ ILogger logger = loggerFactory.CreateLogger<Program>();
 
 var lidar = host.Services.GetRequiredService<ILidarService>();
 lidar.Init();
+Console.WriteLine("Push any key to start scanning..");
+Console.ReadKey();
 await lidar.StartAsync();
 
 Console.ReadLine();
