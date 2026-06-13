@@ -90,6 +90,7 @@ public class LidarService : ILidarService
                 _ultraborgServo!.SetServoPosition(servoPos);
                 if (lastPoint is not null)
                     lastPoint= lastPoint with { Angle = angle };
+                Thread.Sleep(100);
             }
             catch (TimeoutException)
             {
