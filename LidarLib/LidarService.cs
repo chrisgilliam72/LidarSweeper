@@ -57,7 +57,7 @@ public class LidarService : ILidarService
 
         _port.Open();
 
-        _ultraborgServo!.SetServoPosition(-1);
+        _ultraborgServo!.SetServoPosition(-1.1);
         _logger.LogInformation("Opened lidar on {Port}", _port.PortName);
 
 
