@@ -44,7 +44,6 @@ public class LidarService : ILidarService
         _logger.LogInformation($"Current Position: {_currentPosition}");
         int servoMax = _ultraborgServo.ServoMax;
         int servoMin = _ultraborgServo.ServoMin;
-        _ultraborgServo.SetServoPosition(-0.95);
     }
 
     public Task StartAsync(CancellationToken cancellationToken = default)
@@ -133,6 +132,7 @@ public class LidarService : ILidarService
 
     private LidarPoint? GetLidarPoint()
     {
+        _port.DiscardInBuffer();
         int b;
 
         do
