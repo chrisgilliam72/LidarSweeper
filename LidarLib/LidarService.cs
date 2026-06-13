@@ -45,6 +45,7 @@ public class LidarService : ILidarService
         _logger.LogInformation($"Current Position: {_currentPosition}");
         int servoMax = _ultraborgServo.ServoMax;
         int servoMin = _ultraborgServo.ServoMin;
+        Thread.Sleep(500);
         _ultraborgServo!.SetServoPosition(-0.95);
     }
 
