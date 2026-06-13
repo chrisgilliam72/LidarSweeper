@@ -47,7 +47,7 @@ public class LidarService : ILidarService
         int servoMin = _ultraborgServo.ServoMin;
         Thread.Sleep(100);
         _ultraborgServo!.SetServoPosition(-1);
-        _ultraborgServo!.SetServoPosition(-1);
+
     }
 
     public Task StartAsync(CancellationToken cancellationToken = default)
@@ -57,6 +57,7 @@ public class LidarService : ILidarService
 
         _port.Open();
 
+        _ultraborgServo!.SetServoPosition(-1);
         _logger.LogInformation("Opened lidar on {Port}", _port.PortName);
 
 
