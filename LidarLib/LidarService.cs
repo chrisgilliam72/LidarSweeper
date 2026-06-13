@@ -45,8 +45,6 @@ public class LidarService : ILidarService
         int servoMax = _ultraborgServo.ServoMax;
         int servoMin = _ultraborgServo.ServoMin;
         _ultraborgServo.SetServoPosition(-0.95);
-        _currentPosition = _ultraborgServo.GetCurrentPosition();
-        _logger.LogInformation($"Start Position: {_currentPosition}");
     }
 
     public Task StartAsync(CancellationToken cancellationToken = default)
@@ -72,21 +70,26 @@ public class LidarService : ILidarService
 
         double servoPos = -1;
         int angle= 0;
+        bool rightLeft = true;
         _ultraborgServo!.SetServoPosition(servoPos);
         while (!token.IsCancellationRequested)
         {
             try
             {
                 var lastPoint=  GetLidarPoint();
-                if (servoPos < 1)
+                if (rightLeft)
                 {
                     angle += 10;
                     servoPos += 0.1;
+                    if (servoPos >= 1)
+                        rightLeft = false;
                 }
                 else
                 {
                     angle -= 10;
                     servoPos -= 0.1;
+                    if (servoPos<=-1)
+                        rightLeft = true;
                 }           
 
 
