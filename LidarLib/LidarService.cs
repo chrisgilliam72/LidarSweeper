@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System.IO.Ports;
 using Ultraborg;
 using Ultraborg.Library.Servo;
+using UnitsNet;
 
 public class LidarService : ILidarService
 {
@@ -71,6 +72,7 @@ public class LidarService : ILidarService
 
         double servoPos = -1;
         int angle= 0;
+        _ultraborgServo!.SetServoPosition(servoPos);
         while (!token.IsCancellationRequested)
         {
             try
@@ -87,10 +89,15 @@ public class LidarService : ILidarService
                     servoPos -= 0.1;
                 }           
 
-                _ultraborgServo!.SetServoPosition(servoPos);
+
                 if (lastPoint is not null)
-                    lastPoint= lastPoint with { Angle = angle };
+                {
+                    lastPoint = lastPoint with { Angle = angle };
+                    _logger.LogInformation($"Angle= {lastPoint.Angle} Distance={lastPoint.Distance} cm  Strength={lastPoint.Strengh}" );
+                }
+
                 Thread.Sleep(100);
+                _ultraborgServo!.SetServoPosition(servoPos);
             }
             catch (TimeoutException)
             {
@@ -162,7 +169,7 @@ public class LidarService : ILidarService
 
             int temperatureRaw = frame[4] | (frame[5] << 8);
             var Temperature = temperatureRaw / 8.0 - 256.0;
-            _logger.LogInformation($"Distance={Distance} cm  Strength={Strength}  Temp={Temperature:F1}°C");
+
             return new LidarPoint(0, Distance, Strength, DateTime.Now);
 
         }
