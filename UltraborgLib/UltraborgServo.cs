@@ -22,15 +22,15 @@ namespace Ultraborg.Library.Servo
         private Ultraborg Ultraborg { get; set; } = new Ultraborg();
 
         private double _position { get; set; }
-        private  readonly ILogger logger;
+        private  readonly ILogger _logger;
 
 
-        public UltraborgServo(int servoNo, double servoNeutral,ILoggerFactory loggerFactory)
+        public UltraborgServo(int servoNo, double servoNeutral,ILogger logger)
         {
             ServoNo = servoNo;
             ServoNeutral = servoNeutral;
             _position = servoNeutral;
-            logger=loggerFactory.CreateLogger("UltraborgServo");
+            _logger= logger;
         }
 
         public void Init(Ultraborg ultraborg)
@@ -40,7 +40,7 @@ namespace Ultraborg.Library.Servo
 
             ServoMax = limitsServo.Maximum;
             ServoMin = limitsServo.Minimum;
-            logger.LogInformation($"Servo {ServoNo} limits: Min: {ServoMin}, Max: {ServoMax}"); 
+            _logger.LogInformation($"Servo {ServoNo} limits: Min: {ServoMin}, Max: {ServoMax}"); 
         }
 
         public void Test()

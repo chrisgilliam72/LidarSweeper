@@ -30,7 +30,7 @@ var lidar = host.Services.GetRequiredService<ILidarService>();
 
 ultraborgAPI.Setup();
 var ultraborg = ultraborgAPI?.Ultraborg;
-var ultraborgServo = new UltraborgServo(4, 0,loggerFactory);
+var ultraborgServo = new UltraborgServo(4, 0, logger);
 ultraborgServo.Init(ultraborg!);
 int currentPosition = ultraborgServo.GetCurrentPosition();
 logger.LogInformation($"Current Position: {currentPosition}");
