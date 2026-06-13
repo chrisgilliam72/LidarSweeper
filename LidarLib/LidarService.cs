@@ -13,7 +13,7 @@ using Ultraborg.Library.Servo;
 public class LidarService : ILidarService
 {
     private readonly ILogger _logger;
-    private readonly UltraborgAPI _ultraborgAPI;
+    private readonly IUltraborgAPI _ultraborgAPI;
     private readonly SerialPort _port;
 
     private Task? _readerTask;
@@ -23,7 +23,7 @@ public class LidarService : ILidarService
     private UltraborgServo? _ultraborgServo;
     public LidarPoint? LastPoint { get; set; }
 
-    public LidarService(ILogger<LidarService> logger, UltraborgAPI ultraborgAPI)
+    public LidarService(ILogger<LidarService> logger, IUltraborgAPI ultraborgAPI)
     {
         _logger = logger;
         _ultraborgAPI= ultraborgAPI;
