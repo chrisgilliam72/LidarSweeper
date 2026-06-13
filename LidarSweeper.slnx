@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="LidarSweeper/LidarSweeper.csproj" />
+  <Project Path="UI/UI.csproj" Id="2a292c84-1c2a-4369-83f7-ed2a169c1068" />
   <Project Path="UltraborgLib/UltraborgLib.csproj" />
 </Solution>
